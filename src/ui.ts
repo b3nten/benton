@@ -109,7 +109,7 @@ let sheet = new CSSStyleSheet();
 document.adoptedStyleSheets.push(sheet);
 
 // emojis map to digits in the hash
-var emoji = ["🐈‍⬛", "🍁", "🐙", "🍉", "🐸", "🗿", "🐷", "🌧️", "🫡", "🍺"];
+let emoji = ["🐈‍⬛", "🍁", "🐙", "🍉", "🐸", "🗿", "🐷", "🌧️", "🫡", "🍺"];
 
 let toEmoji = (str: string) => {
   let hash = String(cyrb53(str));
@@ -233,14 +233,11 @@ export function Attribute<T>(
         "Invalid decorator usage: @attribute only works on class accessors.",
       );
     }
-
     let attrName = options.overriddenName ?? name;
     let converter = options.converter ?? default_attr_converter;
-
     if (!observed_attrs.has(metadata!))
       observed_attrs.set(metadata!, new Set());
     observed_attrs.get(metadata!)!.add(attrName);
-
     addInitializer(function (this: This) {
       let config = this._attrMap.get(attrName);
       if (!config) {
@@ -332,21 +329,29 @@ export class UIElement extends HTMLElement {
     // @ts-ignore
     return Array.from(observed_attrs.get(this[Symbol.metadata]) ?? []);
   }
+
   started: boolean = false;
+
   startup?: () => void;
+
   shutdown?: () => void;
+
   remount?: () => void;
+
   connectedCallback() {
     this.started = true;
     this.startup?.();
   }
+
   disconnectedCallback() {
     this.shutdown?.();
     this.started = false;
   }
+
   adoptedCallback() {
     this.remount?.();
   }
+
   attributeChangedCallback(
     name: string,
     oldValue: string | null,
@@ -363,6 +368,7 @@ export class UIElement extends HTMLElement {
       }
     }
   }
+
   _attrMap = new Map<
     string | symbol,
     Array<{
@@ -395,18 +401,15 @@ export function createElement<T>(element: T) {
     let tag = element as keyof HTMLElementTagNameMap;
     return document.createElement(tag);
   }
-
   if (isCustomElement(element)) {
     if (!(element as Constructor<UIElement>).Name) {
       element.Name = `${element.name.toLowerCase()}-${crypto.randomUUID()}`;
     }
-
     if (!customElements.get(element.Name)) {
       customElements.define(element.Name, element);
     }
     return document.createElement(element.Name);
   }
-
   throw TypeError(
     `Invalid element type: ${element}. Must be a string or a constructor.`,
   );
